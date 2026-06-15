@@ -1,5 +1,5 @@
 # Predictive Customer Lifetime Value Automation Suite 🍽️📈
-
+Context-Aware Retrieval-Augmented Generation (RAG) Agent
 An Enterprise AI Agent Operating System built for the retail and Food & Beverage (F&B) sectors to actively maximize Customer Lifetime Value (LTV), automate multi-tier feedback loop workflows, and mitigate consumer churn risk. 
 
 This infrastructure interfaces automated trigger crons, targets sentiment vector matrices via **Google Gemini (PaLM/1.5 Flash)** models, and schedules automated marketing retention messaging channels.
