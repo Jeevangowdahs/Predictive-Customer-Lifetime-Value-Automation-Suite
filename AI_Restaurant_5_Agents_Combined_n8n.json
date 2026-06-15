@@ -1,0 +1,552 @@
+{
+  "name": "AI Restaurant Growth Automation Suite - 5 Agents Combined",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "1",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "2",
+      "name": "Daily Review Fetch Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        50
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "10",
+      "name": "Dormant Customer Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "20",
+      "name": "Daily Sales Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        310
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "days",
+              "daysInterval": 7
+            }
+          ]
+        }
+      },
+      "id": "30",
+      "name": "Competitor Monitor Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "id": "40",
+      "name": "Negative Review Escalation Cron",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        200,
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "YOUR_REVIEW_SHEET_ID"
+      },
+      "id": "3",
+      "name": "Get Reviews Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        420,
+        50
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Write a professional restaurant review response based on customer review text: {{$json.review}}"
+      },
+      "id": "4",
+      "name": "GPT Review Reply Writer",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        50
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "manager@restaurant.com",
+        "subject": "New AI Review Response",
+        "message": "{{$json.text}}"
+      },
+      "id": "5",
+      "name": "Send Manager Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        900,
+        50
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "YOUR_CUSTOMER_CRM_ID"
+      },
+      "id": "11",
+      "name": "Get Dormant Customers",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        420,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Create a personalized comeback WhatsApp offer for dormant customer {{$json.name}} who has not ordered in {{$json.days}} days"
+      },
+      "id": "12",
+      "name": "GPT Offer Generator",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/WHATSAPP_ID/messages",
+        "method": "POST"
+      },
+      "id": "13",
+      "name": "WhatsApp Send",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        900,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "YOUR_DAILY_SALES_ID"
+      },
+      "id": "21",
+      "name": "Read POS Sales",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        420,
+        310
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Analyze today's restaurant sales data {{$json}} and give owner insights on best sellers, weak dishes, avg order value, revenue leaks"
+      },
+      "id": "22",
+      "name": "GPT Sales Analyst",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        310
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "owner@restaurant.com",
+        "subject": "Daily AI Sales Summary",
+        "message": "{{$json.text}}"
+      },
+      "id": "23",
+      "name": "Email Sales Summary",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        900,
+        310
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://competitor-zomato-scrape-api.com/data",
+        "method": "GET"
+      },
+      "id": "31",
+      "name": "Fetch Competitor Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        420,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Compare competitor restaurant offers/menu/pricing {{$json}} with our restaurant and suggest strategic response"
+      },
+      "id": "32",
+      "name": "GPT Competitor Insight",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "to": "owner@restaurant.com",
+        "subject": "Weekly Competitor Intelligence",
+        "message": "{{$json.text}}"
+      },
+      "id": "33",
+      "name": "Send Weekly Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 1,
+      "position": [
+        900,
+        440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "sheetId": "YOUR_REVIEW_SHEET_ID"
+      },
+      "id": "41",
+      "name": "Fetch Low Star Reviews",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 1,
+      "position": [
+        420,
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "prompt": "Customer left a negative review: {{$json.review}}. Draft apology + refund/coupon recovery message + internal escalation severity"
+      },
+      "id": "42",
+      "name": "GPT Recovery Draft",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [
+        650,
+        570
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://graph.facebook.com/v19.0/WHATSAPP_ID/messages",
+        "method": "POST"
+      },
+      "id": "43",
+      "name": "Manager WhatsApp Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        900,
+        570
+      ]
+    }
+  ],
+  "connections": {
+    "2": {
+      "main": [
+        [
+          {
+            "node": "3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3": {
+      "main": [
+        [
+          {
+            "node": "4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4": {
+      "main": [
+        [
+          {
+            "node": "5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5": {
+      "main": [
+        [
+          {
+            "node": "",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10": {
+      "main": [
+        [
+          {
+            "node": "11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11": {
+      "main": [
+        [
+          {
+            "node": "12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12": {
+      "main": [
+        [
+          {
+            "node": "13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "13": {
+      "main": [
+        [
+          {
+            "node": "",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "20": {
+      "main": [
+        [
+          {
+            "node": "21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "21": {
+      "main": [
+        [
+          {
+            "node": "22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "22": {
+      "main": [
+        [
+          {
+            "node": "23",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "23": {
+      "main": [
+        [
+          {
+            "node": "",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "30": {
+      "main": [
+        [
+          {
+            "node": "31",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "31": {
+      "main": [
+        [
+          {
+            "node": "32",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "32": {
+      "main": [
+        [
+          {
+            "node": "33",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "33": {
+      "main": [
+        [
+          {
+            "node": "",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "40": {
+      "main": [
+        [
+          {
+            "node": "41",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "41": {
+      "main": [
+        [
+          {
+            "node": "42",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "42": {
+      "main": [
+        [
+          {
+            "node": "43",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "43": {
+      "main": [
+        [
+          {
+            "node": "",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "4327d48d-2d1f-4f4b-8a26-336671a0fce3"
+}

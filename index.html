@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent OS for Food & Beverages — Orders · Kitchen · HR · Finance</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#0f1117;color:#e2e8f0;line-height:1.6}
+nav{background:#1a1f2e;padding:14px 24px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:100;border-bottom:1px solid #2d3748}
+nav a{color:#94a3b8;text-decoration:none;font-size:13px;font-weight:600;padding:6px 14px;border-radius:6px;transition:all .2s}
+nav a:hover{background:#d97706;color:#fff}
+.hero{background:linear-gradient(135deg,#1f1507 0%,#0f1117 60%);padding:60px 40px;text-align:center;border-bottom:1px solid #2d3748}
+.hero .badge{display:inline-block;background:#d9770622;border:1px solid #f59e0b;color:#fbbf24;padding:6px 18px;border-radius:100px;font-size:12px;letter-spacing:.08em;margin-bottom:20px;font-weight:600}
+.hero h1{font-size:clamp(1.8rem,4vw,3rem);font-weight:800;background:linear-gradient(135deg,#fbbf24,#f87171,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px;line-height:1.15}
+.hero p{font-size:16px;color:#94a3b8;max-width:680px;margin:0 auto 28px}
+.stat-row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.stat{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px 24px;text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;color:#fbbf24}
+.stat-label{font-size:12px;color:#64748b;margin-top:2px}
+.dept-header{background:linear-gradient(90deg,#1f1507,#1e293b);border-left:5px solid #f59e0b;padding:32px 40px;margin:48px 0 0}
+.dept-header .dept-emoji{font-size:2.5rem;margin-bottom:8px;display:block}
+.dept-header h2{font-size:1.6rem;font-weight:800;color:#fff;margin-bottom:6px}
+.dept-header p{color:#94a3b8;font-size:14px;max-width:700px}
+.dept-header .dept-count{display:inline-block;background:#f59e0b22;border:1px solid #f59e0b;color:#fbbf24;padding:3px 12px;border-radius:100px;font-size:12px;font-weight:600;margin-top:10px}
+.agents-grid{display:grid;grid-template-columns:1fr;gap:0}
+.agent-card{background:#111827;border-bottom:1px solid #1e293b;padding:32px 40px;transition:background .2s;display:grid;grid-template-columns:auto 1fr;gap:24px}
+.agent-card:hover{background:#131920}
+.agent-num{font-size:2rem;font-weight:900;color:#1f1507;min-width:36px;padding-top:4px}
+.agent-body{}
+.agent-meta{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.agent-id{font-size:11px;color:#64748b;font-weight:600;letter-spacing:.06em;background:#1e293b;padding:2px 10px;border-radius:100px}
+.agent-tag{font-size:11px;color:#fbbf24;font-weight:600;letter-spacing:.04em}
+.agent-card h3{font-size:1.15rem;font-weight:700;color:#f1f5f9;margin-bottom:8px}
+.agent-card .agent-desc{font-size:14px;color:#94a3b8;margin-bottom:18px;line-height:1.65}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.io-box{background:#0f1117;border:1px solid #1e293b;border-radius:10px;padding:14px 16px}
+.io-box h4{font-size:11px;font-weight:700;letter-spacing:.08em;margin-bottom:8px}
+.io-box.input h4{color:#fbbf24}
+.io-box.output h4{color:#34d399}
+.io-box ul{list-style:none;padding:0}
+.io-box ul li{font-size:13px;color:#94a3b8;padding:2px 0;padding-left:14px;position:relative}
+.io-box ul li::before{content:"→";position:absolute;left:0;color:#475569;font-size:11px;top:3px}
+.example-box{background:#1a0e00;border:1px solid #3d2200;border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.example-box h4{font-size:11px;color:#fbbf24;font-weight:700;letter-spacing:.08em;margin-bottom:8px}
+.example-box p{font-size:13px;color:#fed7aa;line-height:1.6;font-style:italic}
+.impact-row{display:flex;gap:12px;align-items:flex-start;background:#0d1f12;border:1px solid #14532d;border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.impact-icon{font-size:1.3rem;flex-shrink:0}
+.impact-text{font-size:13px;color:#86efac;line-height:1.55}
+.tools-row{display:flex;gap:8px;flex-wrap:wrap}
+.tool-chip{background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px}
+.best3{background:#1a1a0e;border:1px solid #3d3d00;border-radius:14px;padding:24px 32px;margin:32px 40px}
+.best3-label{font-size:14px;font-weight:800;color:#fbbf24;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.best3 ol{padding-left:20px}
+.best3 ol li{font-size:13px;color:#e2e8f0;padding:4px 0}
+.best3 ol li span{color:#94a3b8}
+.section-divider{height:2px;background:linear-gradient(90deg,#f59e0b,#f87171,transparent);margin:0}
+footer{background:#0a0d14;padding:40px;text-align:center;border-top:1px solid #1e293b;margin-top:60px}
+footer p{font-size:13px;color:#475569}
+footer strong{color:#fbbf24}
+@media(max-width:640px){.agent-card{grid-template-columns:1fr;gap:8px;padding:24px 20px}.io-grid{grid-template-columns:1fr}.dept-header,.best3{padding:24px 20px}.hero{padding:40px 20px}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="#marketing">🍽️ Marketing</a>
+  <a href="#sales">📦 Orders & Sales</a>
+  <a href="#kitchen">👨‍🍳 Kitchen & Ops</a>
+  <a href="#hr">👥 HR</a>
+  <a href="#finance">💰 Finance</a>
+</nav>
+
+<div class="hero">
+  <div class="badge">🍽️ BHARAT UNNATI AI FELLOWSHIP — STUDENT PROJECT</div>
+  <h1>AI Agent OS<br>for Food & Beverages</h1>
+  <p>50 production-ready AI agents across Marketing, Orders, Kitchen Operations, HR and Finance — each defined with inputs, outputs, real examples, tools, and direct business benefit for your restaurant, cloud kitchen, QSR, or F&B brand.</p>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-num">50</div><div class="stat-label">AI Agents</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">Departments</div></div>
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label">Agents Each</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label">Business Impact</div></div>
+  </div>
+</div>
+
+<div id="marketing" class="dept-header">
+  <span class="dept-emoji">🍽️</span>
+  <h2>Department 1 of 5 — Marketing Agents</h2>
+  <p>Fill every table, seat, and delivery slot. These 10 agents generate menu content, run festival campaigns, manage loyalty engagement, and turn your customer database into a daily revenue engine — without a full-time marketing hire.</p>
+  <span class="dept-count">10 Marketing Agents</span>
+</div>
+<div class="section-divider"></div>
+<div class="agents-grid">
+
+  <div class="agent-card">
+    <div class="agent-num">1</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-01</span><span class="agent-tag">Content</span></div>
+      <h3>Menu Promotion Content Generator</h3>
+      <p class="agent-desc">Analyzes your current menu, bestsellers, and margin per dish — then auto-generates high-converting promotional content for Instagram, Zomato, Swiggy, and WhatsApp. Hero dishes get spotlight treatment; high-margin items get narrative framing. Updated weekly with seasonal tweaks.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Current menu with pricing and margins</li><li>Bestseller data (last 30 days)</li><li>Seasonal ingredient availability</li><li>Target platform (Instagram/Zomato/WhatsApp)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Caption for each featured dish (3 lengths)</li><li>Story format post script</li><li>Zomato/Swiggy listing description update</li><li>WhatsApp broadcast message (weekly special)</li><li>Hashtag and keyword recommendations</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Our Malabar Fish Curry is hand-ground spice masala, slow-cooked for 4 hours. ₹320. Only 18 portions made daily. Order before 7 PM — it sells out every night. 🌶️ [Swiggy link] #Kozhikodan #FishCurry #CloudKitchen"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Restaurants that update menu descriptions monthly see 18–22% higher online order conversion. Most update them once a year — or never. This agent makes weekly updates effortless.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n Scheduler</span><span class="tool-chip">Canva API</span><span class="tool-chip">Zomato Partner API</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">2</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-02</span><span class="agent-tag">Campaigns</span></div>
+      <h3>Festival & Seasonal Campaign Creator</h3>
+      <p class="agent-desc">Generates complete festival campaign packages — special menu suggestions, offer structures, themed decorations brief, social media calendar, and WhatsApp sequences — for every major Indian festival and season. Launched 2 weeks in advance, with a daily countdown content plan.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Upcoming festival/season name</li><li>Kitchen capacity for special items</li><li>Budget for offers/discounts</li><li>Target customer segment (dine-in/delivery/corporate)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Festival theme concept and tagline</li><li>Special menu item suggestions (3–5)</li><li>7-day social media content calendar</li><li>WhatsApp sequence (3 messages)</li><li>Corporate catering offer letter</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Diwali Feast at Spice Garden: Share the sweetness. Special Thali — 7 dishes, 1 dessert. ₹599/person. Available Oct 28–Nov 3. Book a table for 6+ and get complimentary Gulab Jamun platter. 🪔 [Book: link] Only 12 Thali sets per day."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Festival season accounts for 35–45% of annual restaurant revenue. Campaigns launched 2 weeks early with advance booking consistently outperform last-minute promotions by 60% in covers and revenue.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp Business</span><span class="tool-chip">Canva</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">3</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-03</span><span class="agent-tag">Loyalty</span></div>
+      <h3>Loyalty Program Engagement Agent</h3>
+      <p class="agent-desc">Manages your customer loyalty program automatically — tracking points, generating milestone messages, sending personalized reactivation offers to dormant members, and creating VIP experience surprises for top spenders. Turns a points program from a spreadsheet into a relationship engine.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Customer loyalty database (points, visit history)</li><li>Membership tier structure</li><li>Dormant threshold (days since last visit)</li><li>VIP spend threshold</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Birthday and anniversary surprise message</li><li>Tier upgrade congratulation</li><li>Dormant member reactivation offer</li><li>VIP experience notification</li><li>Monthly loyalty program performance report</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Happy Birthday, Ananya! 🎂 Your loyalty means everything to us. Your birthday gift: ₹500 off your next dine-in + a complimentary dessert of your choice. Valid for 7 days. Reserve your table: [link]. Looking forward to celebrating with you!"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Loyalty members spend 2.7× more per visit and visit 3× more often than non-members. An engaged loyalty program is the highest-ROI marketing activity for any restaurant.</div></div>
+      <div class="tools-row"><span class="tool-chip">CRM</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp API</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">4</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-04</span><span class="agent-tag">Social Media</span></div>
+      <h3>Food Photography Caption & Social Post Agent</h3>
+      <p class="agent-desc">For every dish photo shared by the kitchen team, this agent generates platform-optimized captions for Instagram, Facebook, and Google Business — with the right tone (indulgent vs health-conscious vs festive), relevant hashtags, and a call-to-action calibrated to the dish and time of day.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Dish name and description</li><li>Target platform</li><li>Time of day and week</li><li>Campaign context (if any)</li><li>Price point</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Instagram caption (2 lengths)</li><li>Facebook post with engagement question</li><li>Google Business post</li><li>10–15 relevant hashtags</li><li>Best posting time recommendation</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Some things just cannot be rushed. Our Dum Biryani has been slow-cooking for 5 hours in sealed deghs. The first crack of the seal is a ceremony. 🍛 Ready at 1 PM. Dine-in and takeaway. ₹380. Reserve: [link] #DumBiryani #SlowCooking #Hyderabad"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Restaurants posting 4–5 times per week on Instagram see 34% more organic discovery than those posting once a week. This agent makes daily posting effortless for a kitchen-first team.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n Scheduler</span><span class="tool-chip">Instagram Graph API</span><span class="tool-chip">Canva</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">5</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-05</span><span class="agent-tag">Reputation</span></div>
+      <h3>Customer Review Response Agent</h3>
+      <p class="agent-desc">Monitors Google, Zomato, and Swiggy reviews in real time. For positive reviews (4–5 stars), generates a warm personalized thank-you that mentions the specific dish or experience. For negative reviews (1–3 stars), generates a professional, empathetic response with a recovery offer — within 2 hours.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Review text and rating</li><li>Platform (Google/Zomato/Swiggy)</li><li>Reviewer name (if visible)</li><li>Restaurant response history</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Personalized positive response (within 30 mins)</li><li>Empathetic negative response + recovery offer</li><li>Escalation flag for severe complaints</li><li>Weekly sentiment analysis summary</li><li>Response rate and speed metrics</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"[Response to 2-star: 'Food was cold on delivery'] We're truly sorry, Rakesh. Cold delivery is never acceptable — and we take full responsibility. We've flagged this with our packaging team. Please accept a 100% refund + ₹150 voucher for your next order. DM us and we'll sort this today. — Team Spice Garden"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Restaurants that respond to 100% of reviews see 35% higher repeat order rate. Responding to negative reviews publicly and empathetically turns a public complaint into a trust signal for every future reader.</div></div>
+      <div class="tools-row"><span class="tool-chip">Zomato Partner API</span><span class="tool-chip">Google My Business API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">6</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-06</span><span class="agent-tag">Intelligence</span></div>
+      <h3>Competitor Menu Intelligence Agent</h3>
+      <p class="agent-desc">Monitors competitor restaurants on Zomato and Swiggy — tracking their menu additions, price changes, promotional offers, and rating trends — and generates a weekly competitive brief so you can respond to market moves before customers switch.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Competitor restaurant names and IDs</li><li>Your menu categories for comparison</li><li>Price sensitivity by dish category</li><li>Rating trend threshold for alerts</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Weekly competitor change report</li><li>Price comparison table (your items vs competitor)</li><li>New dish alert (if competitor adds a category you lack)</li><li>Rating trend warning (if competitor improves rapidly)</li><li>Recommended response action</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Alert: Biryani House (competitor, 0.8 km) added 'Chicken Tikka Biryani' at ₹299 (your equivalent: ₹340). Their rating improved from 3.8 to 4.2 in 30 days. Recommend: Run a ₹299 introductory Tikka Biryani offer for 15 days + actively request reviews from happy customers this week."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B is hyper-local and hyper-competitive. A competitor gaining 0.2 stars on Zomato translates to 15–20% order shift. Knowing before customers notice gives you time to counter.</div></div>
+      <div class="tools-row"><span class="tool-chip">Zomato Scrape</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">7</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-07</span><span class="agent-tag">Campaigns</span></div>
+      <h3>Festival Offer & Combo Architect Agent</h3>
+      <p class="agent-desc">Designs profitable combo offers and value bundles — calculating the right price point that maximizes perceived value for the customer while protecting margin for the business. Generates offer structures, names, and marketing copy for each campaign.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Individual dish prices and food costs</li><li>Target combo price point</li><li>Customer order history (popular combinations)</li><li>Occasion or campaign context</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Top 5 combo suggestions with names</li><li>Food cost % per combo</li><li>Margin analysis per combo</li><li>Combo promotion copy (for menu, app, WhatsApp)</li><li>Suggested validity period and terms</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Family Sunday Feast — Serves 4: Butter Chicken + Dal Makhani + 8 Roomali Rotis + Jeera Rice + 1 Gulab Jamun each. Combo price: ₹999 (vs individual: ₹1,340). Food cost: ₹340 (34%). GM: ₹659 (66%). Name: 'The Sunday Table'. Launch Sunday for 4 weeks and A/B test vs. standard menu orders."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Combo offers increase average order value by 28–40% while making customers feel they got a deal. The key is engineering combos that feel like savings but protect your margin — this agent does the math automatically.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n</span><span class="tool-chip">Zomato/Swiggy Listing API</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">8</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-08</span><span class="agent-tag">Engagement</span></div>
+      <h3>WhatsApp Customer Broadcast Agent</h3>
+      <p class="agent-desc">Segments your customer database by order history, cuisine preference, order frequency, and last order date — then generates personalized WhatsApp broadcast messages for each segment. No more one-blast-for-all campaigns that feel impersonal and generate low response.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Customer database with order history</li><li>Campaign objective (re-engage/promote/loyalty)</li><li>Special offer or event to promote</li><li>Preferred cuisine tags per customer</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Customer segments (5–7 categories)</li><li>Personalized message per segment</li><li>Send schedule recommendation</li><li>Response tracking setup</li><li>Opt-out management instructions</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"[Segment: Biryani lovers, last order 21+ days ago]: Hi Fatima! It's been 3 weeks since your last biryani fix. 🍛 We've added a new Thalassery Biryani this week — very limited daily. Your loyalty code: FATIMA15 for 15% off today only. Order: [link]"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Generic food broadcast messages get 4–7% response. Segmented, preference-based messages get 25–35% engagement — and the customers who respond are the ones most likely to order.</div></div>
+      <div class="tools-row"><span class="tool-chip">WhatsApp Business API</span><span class="tool-chip">n8n</span><span class="tool-chip">CRM</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">9</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-09</span><span class="agent-tag">Influencer</span></div>
+      <h3>Food Influencer Outreach Agent</h3>
+      <p class="agent-desc">Identifies relevant local food influencers on Instagram (by follower count, engagement rate, cuisine focus, and city), generates personalized outreach messages, proposes collaboration formats (media meal, reel collaboration, review), and tracks response and content delivery.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Target city and cuisine category</li><li>Budget for influencer collaboration</li><li>Preferred influencer tier (nano/micro/mid)</li><li>Campaign objective (launch/awareness/reviews)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Shortlist of 10–15 relevant influencers</li><li>Personalized outreach message per influencer</li><li>Collaboration proposal (formats and deliverables)</li><li>Cost-benefit estimate per influencer tier</li><li>Follow-up sequence if no response</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Hi Deepa! 👋 We've been following your Hyderabad food content and your Irani Chai series was spot-on. We're a 3-month old Malabar kitchen in Banjara Hills — and we'd love to host you for a media meal. No obligation, no script — just honest food and good chai. Interested? 🍛"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A single micro-influencer post from a credible local foodie generates 200–800 genuine new profile visits. For a restaurant, even 10% conversion = 20–80 first-time customers from one collaboration.</div></div>
+      <div class="tools-row"><span class="tool-chip">Instagram Graph API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">10</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">MKT-10</span><span class="agent-tag">Acquisition</span></div>
+      <h3>New Product Launch Campaign Agent</h3>
+      <p class="agent-desc">When a new dish, menu section, or brand concept is being launched, this agent builds a complete pre-launch, launch, and post-launch marketing plan — with content calendar, WhatsApp teaser sequence, launch day promotions, and post-launch feedback collection.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>New dish/menu/brand details</li><li>Launch date and venue</li><li>Target customer segment</li><li>Budget for launch promotion</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Pre-launch teaser content (7 days before)</li><li>Launch day campaign (social + WhatsApp + Zomato)</li><li>Influencer invite brief</li><li>Post-launch feedback collection (3 days after)</li><li>Performance tracking template</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Pre-launch Day -5: 'Something new is cooking. Hint: It traveled 1,400 km to reach your plate. Guess? 🌿' Day -3: 'Malabar Coast. Hand-ground spices. 4 hours of slow cooking. Reveal: Friday.' Launch Day: 'The wait is over. Malabar Specials are live on Zomato now. First 50 orders get complimentary Appam.'"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A structured launch creates anticipation, drives first-day orders, and generates content for 2 weeks — vs a silent launch that nobody notices. The teaser sequence alone increases launch-day orders by 3–4×.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp Business</span><span class="tool-chip">Instagram API</span></div>
+    </div>
+  </div>
+</div><div class="best3"><div><div class="best3-label">🔥 Best 3 Marketing Agents to Build First</div><ol>
+<li><strong>Customer Review Response Agent</strong> <span>— protects and builds your online reputation daily</span></li>
+<li><strong>WhatsApp Customer Broadcast Agent</strong> <span>— monetizes existing customer database immediately</span></li>
+<li><strong>Festival Campaign Creator</strong> <span>— fills seats during the highest-revenue days of the year</span></li>
+</ol></div></div><div class="section-divider"></div>
+<div id="sales" class="dept-header">
+  <span class="dept-emoji">📦</span>
+  <h2>Department 2 of 5 — Orders & Sales Agents</h2>
+  <p>Maximize every order — dine-in, delivery, and corporate catering. These 10 agents handle order upselling, repeat order nurturing, abandoned cart recovery, corporate sales, and pipeline management — turning every customer interaction into optimized revenue.</p>
+  <span class="dept-count">10 Order & Sales Agents</span>
+</div>
+<div class="section-divider"></div>
+<div class="agents-grid">
+
+  <div class="agent-card">
+    <div class="agent-num">1</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-01</span><span class="agent-tag">Upsell</span></div>
+      <h3>Order Upsell & Combo Recommender Agent</h3>
+      <p class="agent-desc">When a customer places an order on Zomato, Swiggy, or your own app, this agent analyzes their cart in real time and generates a contextual upsell recommendation — a complementary dish, a beverage pairing, or a combo upgrade — framed as a personalized suggestion, not a generic pop-up.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Customer cart contents</li><li>Customer order history</li><li>Available upsell items and margins</li><li>Time of day and order size</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Top 2 upsell suggestions (personalized)</li><li>Combo upgrade offer (if applicable)</li><li>Upsell copy for in-app prompt</li><li>Expected revenue lift per upsell</li><li>A/B test variant suggestion</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Cart: Chicken Biryani ₹320. Upsell suggestion: 'Customers who order this Biryani usually add Burani Raita (₹60) — it cuts the spice beautifully. Add it?' Combo upgrade: Add a Sheer Khurma for ₹80 and complete the Hyderabadi experience. Average upsell lift: ₹75–110 per order."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Upsell prompts placed contextually (not generically) convert at 22–28% in F&B. On 300 daily orders, even 20% take-up at ₹80 average upsell = ₹4,800 additional daily revenue — ₹1.44L/month from one agent.</div></div>
+      <div class="tools-row"><span class="tool-chip">Zomato/Swiggy API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">POS Integration</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">2</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-02</span><span class="agent-tag">Corporate</span></div>
+      <h3>Corporate Catering Sales Agent</h3>
+      <p class="agent-desc">Identifies nearby corporate offices, IT parks, and coworking spaces, generates personalized outreach pitches, builds a catering proposal, and manages the follow-up sequence — turning your kitchen into a B2B revenue stream alongside retail orders.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Target company names and office locations</li><li>Catering menu and pricing</li><li>Minimum order value</li><li>Delivery radius and capacity</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Target company shortlist with contact research</li><li>Personalized outreach email/message</li><li>Catering proposal (PDF-ready)</li><li>Follow-up sequence (5 touchpoints)</li><li>Contract and payment terms template</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Hi Priya (Office Manager, TechCorp Pune)! We're Spice Garden — 0.8 km from your Hinjewadi office. We serve 40+ corporate offices in Pune. Our daily corporate lunch package: 5 dishes + rice + rotis + dessert. ₹175/person, minimum 20 pax. Free tasting session for your team — 30 mins, no commitment. Interested?"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A single corporate client ordering daily lunch for 30 pax at ₹175 = ₹5,250/day = ₹1.57L/month. 5 corporate clients = ₹7.5L/month in predictable, low-acquisition-cost revenue.</div></div>
+      <div class="tools-row"><span class="tool-chip">LinkedIn</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">3</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-03</span><span class="agent-tag">Retention</span></div>
+      <h3>Repeat Order Trigger Agent</h3>
+      <p class="agent-desc">Monitors customer order patterns and triggers a personalized nudge at exactly the right moment — when a regular customer is overdue for their next order. Not a generic blast, but a specific reminder tied to their favourite dish and last order context.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Customer order history and frequency pattern</li><li>Last order date and dishes ordered</li><li>Average order interval per customer</li><li>Personalization data (name, preferences)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Overdue order nudge (WhatsApp)</li><li>Favourite dish reminder</li><li>Time-sensitive incentive (if needed)</li><li>Best send time per customer</li><li>Frequency pattern analysis dashboard</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Hi Karan! You usually order your Chicken Tikka Masala on Fridays — and it's been 11 days. 🍛 We've made the masala extra smoky this week (new charcoal roasting method). Your usual combo: Tikka + 4 rotis. Order now: [link]"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Repeat customers have 60% lower acquisition cost and 40% higher average order value than new customers. A systematic repeat trigger converts dormant regulars 3× better than generic loyalty program notifications.</div></div>
+      <div class="tools-row"><span class="tool-chip">CRM</span><span class="tool-chip">n8n Scheduler</span><span class="tool-chip">WhatsApp API</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">4</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-04</span><span class="agent-tag">Recovery</span></div>
+      <h3>Abandoned Order Recovery Agent</h3>
+      <p class="agent-desc">When a customer adds items to cart but doesn't complete the order on your own app or WhatsApp ordering system, this agent sends a personalized cart abandonment message within 20 minutes — recovering an order that was 80% completed.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Abandoned cart data (items, time, customer)</li><li>Customer name and contact</li><li>Time elapsed since abandonment</li><li>Previous order history</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Recovery message (within 20 minutes)</li><li>Incentive offer (if high-value cart)</li><li>Simplified order completion link</li><li>Follow-up message (if no response in 1 hour)</li><li>Recovery rate tracking dashboard</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Hi Meera! We noticed you left a Biryani and Raita in your cart 🍛 Did something come up? Your food is still ready to cook — just tap to complete: [one-tap checkout link]. If you're unsure about something, reply here and we'll help instantly."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B cart abandonment averages 65–70% on restaurant apps. Recovery messages within 20 minutes convert 18–25% of abandonments — turning lost orders into completed ones with zero additional marketing spend.</div></div>
+      <div class="tools-row"><span class="tool-chip">Own App/POS</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">5</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-05</span><span class="agent-tag">Reservations</span></div>
+      <h3>Table Reservation Optimizer Agent</h3>
+      <p class="agent-desc">Manages incoming reservation requests intelligently — filling peak slots first, distributing covers across the session, suggesting alternatives for fully-booked times, and sending confirmation + pre-arrival instructions that set expectations and reduce no-shows.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Reservation request details (date, time, pax)</li><li>Current table availability</li><li>Cover capacity per time slot</li><li>Customer history (if repeat diner)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Optimal table assignment</li><li>Confirmation message with instructions</li><li>Pre-arrival experience note</li><li>No-show risk flag (based on history)</li><li>Waitlist management (for fully-booked slots)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Your table for 4 is confirmed at Spice Garden for Saturday 7:30 PM — Table 8 (garden seating). 🌿 Please note: we prepare fresh per order and peak times take 20–25 minutes. We'd love to know if you're celebrating anything special! Arrive 5 mins early to catch the best seating. Confirmation ID: SG-1234"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">No-shows cost a restaurant 8–12% of covered revenue every week. Pre-arrival confirmation + personalized touches reduce no-show rates by 40% and increase average spend by 15% for diners who feel welcomed.</div></div>
+      <div class="tools-row"><span class="tool-chip">Reservation System</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">6</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-06</span><span class="agent-tag">Delivery</span></div>
+      <h3>Delivery Partner Performance Monitor Agent</h3>
+      <p class="agent-desc">Tracks delivery partner performance metrics daily — average delivery time, order accuracy rate, customer complaints, and distance deviation — and generates a weekly scorecard with partner-level insights. Flags underperforming partners before customers write a 1-star review.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Delivery partner GPS data</li><li>Customer rating per delivery</li><li>Delivery time vs SLA</li><li>Order accuracy reports (wrong items/missing)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Weekly partner performance scorecard</li><li>SLA breach alert (per delivery)</li><li>Underperformer flag with evidence</li><li>Feedback template to send to partner</li><li>Recommendation to remove/escalate if repeated</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Partner: Ravi K. (Swiggy) — Week 14 scorecard: Avg delivery time: 38 mins (SLA: 35 mins). Accuracy: 91% (2 missing item complaints). Customer rating: 3.9/5. Action: Flag as WATCH. 2 consecutive weeks below SLA triggers formal escalation to Swiggy partner desk."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A slow or inaccurate delivery destroys your restaurant's Zomato/Swiggy rating — which is controlled by a third-party driver. Systematic monitoring gives you data to demand accountability from platforms.</div></div>
+      <div class="tools-row"><span class="tool-chip">Swiggy/Zomato Partner API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">7</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-07</span><span class="agent-tag">Personalization</span></div>
+      <h3>Customer Taste Preference Profiler Agent</h3>
+      <p class="agent-desc">Builds a living taste profile for each customer — vegetarian/non-veg preference, spice level, cuisine affinity, dietary restrictions, occasion-based ordering patterns — and uses this to personalize every future communication, recommendation, and offer.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Order history (all orders)</li><li>Customer feedback and ratings</li><li>Dietary preference data (if collected)</li><li>Special occasion orders</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Taste profile per customer (JSON format)</li><li>Personalization tags for CRM</li><li>Recommended dishes for next communication</li><li>Dietary restriction alert (for kitchen)</li><li>Segment assignment (e.g., 'Spice Enthusiast', 'Health-Conscious')</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Priya Nair — Taste Profile: Vegetarian. Spice level: Medium-high. Cuisine affinity: Kerala + Continental. Occasion orders: Birthday (March 12). Avg order value: ₹680. Segment: 'Weekend Indulger'. Next best recommendation: Kerala Sadya (festival) or Continental Brunch (weekend). Never: Meat dishes. Allergies: Peanuts flagged."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Personalized F&B recommendations increase order frequency by 24% and average order value by 19%. Customers who feel understood become loyalists — not switchers.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS/CRM</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">8</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-08</span><span class="agent-tag">Re-engagement</span></div>
+      <h3>Lapsed Customer Recovery Agent</h3>
+      <p class="agent-desc">For customers who haven't ordered in 45–90 days, this agent analyzes why they may have lapsed (price, competition, bad experience), identifies a relevant hook, and generates a personalized win-back message — not a generic 'we miss you' but a specific, contextual reason to return.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Lapsed customer list (45–90 day)</li><li>Last order details</li><li>Any complaint or bad rating in history</li><li>New menu items or offers available</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Lapsed classification (silent/price-sensitive/complaint)</li><li>Personalized win-back message</li><li>Recovery offer calibrated to lapse reason</li><li>Send timing recommendation</li><li>Post-recovery tracking plan</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"[Customer last rating: 3 stars, complaint: slow delivery] Hi Vikram! We noticed your experience 2 months ago wasn't up to our standard — and we've been working on it. We've added a dedicated delivery executive and cut our average delivery time from 45 to 28 mins. Welcome back gift: your next order is on us (up to ₹200). Try us once more? 🙏"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">It costs 5× more to acquire a new customer than to recover a lapsed one. A personalized win-back message recovers 15–20% of lapsed customers — and those recovered are more loyal than average because you demonstrated accountability.</div></div>
+      <div class="tools-row"><span class="tool-chip">CRM</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">9</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-09</span><span class="agent-tag">Corporate</span></div>
+      <h3>Bulk & Event Order Qualifier Agent</h3>
+      <p class="agent-desc">When an enquiry comes in for a bulk order, event catering, or large party booking, this agent immediately gathers all necessary details (event type, guest count, cuisine preference, budget, date, location), qualifies the opportunity, generates a preliminary quote, and schedules a follow-up call.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Initial enquiry message or form submission</li><li>Standard catering menu and pricing</li><li>Minimum order thresholds</li><li>Kitchen capacity for the date</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Qualification score (hot/warm/cold)</li><li>Preliminary quote (itemized)</li><li>Clarification questions (if info missing)</li><li>Follow-up call scheduling message</li><li>Custom proposal trigger (for high-value events)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Bulk order enquiry: 200-pax corporate lunch, IT company, Whitefield, Bengaluru, Nov 22nd. Qualification: HOT. Capacity check: Available. Preliminary quote: ₹175/pax × 200 = ₹35,000. Cuisine: South Indian + Continental mix. Follow-up call: 'Hi! We got your enquiry for 200 pax on Nov 22nd. We'd love to serve your team. Can we schedule a 10-minute call to finalize the menu and logistics?'"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Bulk orders are 10–20× higher value than individual orders and have near-zero acquisition cost (they called you). Responding within 30 minutes with a professional quote wins these contracts before competitors quote.</div></div>
+      <div class="tools-row"><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">10</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">SLS-10</span><span class="agent-tag">Analytics</span></div>
+      <h3>Revenue & Order Pipeline Monitor Agent</h3>
+      <p class="agent-desc">Every Monday, this agent analyzes last week's order pipeline — by channel (dine-in/Zomato/Swiggy/WhatsApp), by time slot, by dish category — identifies the top revenue opportunities and leaks, and generates a weekly performance brief with 3 specific actions for the manager.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>POS data by channel and time slot</li><li>Delivery platform order data</li><li>Reservation and walk-in data</li><li>Previous week comparison</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Revenue by channel and day-part</li><li>Top 5 dishes by revenue and margin</li><li>Underperforming time slots</li><li>Top 3 corrective actions (specific)</li><li>Next week target with rationale</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 14 analysis: Sunday lunch (12–2 PM) is your highest revenue 2-hour block (₹28,000 avg) but you're under-staffed on Sundays (1 waiter per 6 tables). Recommendation: Add 1 waiter on Sunday lunch. Projected revenue recovery: ₹4,000–6,000/week. Biryani conversion rate from Zomato is dropping — check listing photos (last updated 4 months ago)."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Most restaurateurs know something is wrong only when the month ends badly. Weekly data review with specific actions closes gaps in real time — before a bad week becomes a bad month.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Zomato/Swiggy API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+</div><div class="best3"><div><div class="best3-label">🔥 Best 3 Order & Sales Agents to Build First</div><ol>
+<li><strong>Repeat Order Trigger Agent</strong> <span>— highest ROI per deploy from existing customer base</span></li>
+<li><strong>Order Upsell Recommender</strong> <span>— lifts every single order value automatically</span></li>
+<li><strong>Corporate Catering Sales Agent</strong> <span>— adds predictable B2B revenue stream</span></li>
+</ol></div></div><div class="section-divider"></div>
+<div id="kitchen" class="dept-header">
+  <span class="dept-emoji">👨‍🍳</span>
+  <h2>Department 3 of 5 — Kitchen & Operations Agents</h2>
+  <p>Run a tight, profitable kitchen. These 10 agents forecast demand, manage inventory, optimize the menu for profitability, ensure hygiene compliance, and reduce waste — turning kitchen operations from reactive chaos into predictable, efficient production.</p>
+  <span class="dept-count">10 Kitchen & Operations Agents</span>
+</div>
+<div class="section-divider"></div>
+<div class="agents-grid">
+
+  <div class="agent-card">
+    <div class="agent-num">1</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-01</span><span class="agent-tag">Forecasting</span></div>
+      <h3>Demand Forecasting Agent</h3>
+      <p class="agent-desc">Analyzes historical order data, weather patterns, day of week, upcoming local events, and seasonal trends to predict next-week demand by dish and time slot — so the kitchen buys exactly what's needed, preps the right quantities, and doesn't run out of bestsellers on peak days.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Historical order data (90 days)</li><li>Weather forecast for the week</li><li>Local events/holidays calendar</li><li>Day-of-week patterns by dish</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Demand forecast by dish (daily)</li><li>Prep quantity guide per dish</li><li>Ingredient purchase list</li><li>Overstock risk flags</li><li>Peak hour staffing recommendation</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 15 forecast: Biryani (weekend): 180 portions Saturday, 210 Sunday (Eid weekend surge +35%). Prep from Friday night. Butter Chicken: 65/day stable. New item Thalassery Fish: 30/day (growing trend). Alert: Haleem demand peaks Eid eve — prepare 120 portions vs normal 40."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Over-prepping wastes ₹8,000–25,000 weekly in perishable ingredients. Under-prepping causes stockouts that disappoint customers and forfeit revenue. Accurate forecasting is the most financially impactful kitchen operation.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS Data</span><span class="tool-chip">n8n</span><span class="tool-chip">Weather API</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">2</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-02</span><span class="agent-tag">Quality</span></div>
+      <h3>Recipe Consistency QC Agent</h3>
+      <p class="agent-desc">Manages standardized recipes digitally — with exact quantities, step-by-step instructions, and photo references — and runs a daily QC spot-check protocol where the head chef scores 3 random dishes against the standard. Tracks consistency scores and flags recipe drift before it reaches customers.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Standardized recipe database</li><li>Daily chef QC spot-check scores</li><li>Customer complaint tags (dish-specific)</li><li>Chef and shift assignment data</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Recipe deviation alert (specific dish and chef)</li><li>QC score trend (weekly)</li><li>Refresher training trigger (if score drops)</li><li>Customer complaint correlation report</li><li>Consistency score by dish category</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"QC Alert — Dal Makhani: 3 consecutive days scored below standard on consistency (butter quantity and cooking time deviation). Likely cause: New Chef Prakash assigned Tuesday–Thursday. Recommend: Head Chef to demonstrate once + share reference photo. Previous score: 8.2. Current: 6.1."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A dish that tastes different on every visit drives Zomato rating variation. Consistency is the most underrated competitive advantage in F&B — and the most manageable with systematic QC.</div></div>
+      <div class="tools-row"><span class="tool-chip">Recipe DB</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">3</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-03</span><span class="agent-tag">Costing</span></div>
+      <h3>Food Cost & Margin Calculator Agent</h3>
+      <p class="agent-desc">Calculates real-time food cost percentage for every dish on the menu — factoring in current ingredient prices, portion sizes, and wastage allowance — and generates a weekly margin report that tells the chef and owner exactly which dishes are bleeding margin and which to promote.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Current ingredient prices (market rate)</li><li>Recipe ingredient quantities per portion</li><li>Wastage percentage per ingredient</li><li>Menu selling prices</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Food cost % per dish</li><li>Gross margin per dish (₹ and %)</li><li>Dishes below target margin (flagged)</li><li>Price revision recommendation</li><li>Weekly margin dashboard</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Margin report — Week 15: Chicken Biryani: food cost 38% ✅ GM: ₹198. Dal Makhani: food cost 24% ✅ GM: ₹171. Paneer Butter Masala: food cost 51% ❌ GM: ₹73 (target: >35%). Recommend: Either increase price by ₹30 or reduce paneer portion by 15g. Current pricing is unsustainable."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Most restaurants discover a dish is unprofitable only when the annual P&L is reviewed. Weekly food cost tracking catches margin erosion in time to correct it — potentially saving ₹30,000–1.5L annually per dish.</div></div>
+      <div class="tools-row"><span class="tool-chip">Recipe DB</span><span class="tool-chip">Ingredient Price API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">4</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-04</span><span class="agent-tag">Inventory</span></div>
+      <h3>Ingredient Reorder Agent</h3>
+      <p class="agent-desc">Monitors ingredient stock levels in real time against daily consumption rates and delivery lead times. Generates automated purchase orders when stock hits reorder point — sent to the supplier with exact quantities, preferred brand specifications, and delivery time requirements.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Current stock levels per ingredient</li><li>Daily consumption rate</li><li>Supplier lead time</li><li>Minimum and maximum stock levels</li><li>Supplier contact and product codes</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Reorder alert (when stock hits threshold)</li><li>Auto-generated purchase order</li><li>Supplier WhatsApp message with PO</li><li>Delivery schedule tracking</li><li>Stock-out risk flag (24 hours in advance)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Reorder alert: Chicken (boneless) — current stock: 8 kg. Daily consumption: 12 kg. Lead time: 6 hours. Reorder point: 15 kg. AUTO-ORDER generated to Mukesh Poultry: 25 kg boneless chicken, Grade A, delivery by 6 AM tomorrow. PO: SPG-045. WhatsApp sent to Mukesh: 9876543210."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Running out of a bestseller ingredient during peak service causes menu unavailability that damages ratings and forces customer order cancellations. Automated reorder prevents 100% of stock-out incidents.</div></div>
+      <div class="tools-row"><span class="tool-chip">Inventory System</span><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">5</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-05</span><span class="agent-tag">Logistics</span></div>
+      <h3>Delivery Time Optimizer Agent</h3>
+      <p class="agent-desc">Analyzes real-time order load, kitchen prep times by dish, and delivery partner availability — then dynamically adjusts the estimated delivery time shown to customers, routes orders to the fastest available prep station, and flags potential delays before they become complaints.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Current order queue and prep status</li><li>Delivery partner availability</li><li>Traffic data for delivery zones</li><li>Dish-wise average prep time</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Dynamic ETA per order (updated in real time)</li><li>Kitchen routing recommendation</li><li>Delay alert (before promised time)</li><li>Customer proactive delay message</li><li>Bottleneck station identification</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Alert: Order #1234 (Biryani + Raita + Dessert) — estimated prep: 22 mins. Current queue: 8 orders. Revised ETA: 47 mins (SLA: 40 mins). Action: Route dessert prep to Station 2 (currently free). Proactive WhatsApp sent to customer: 'Your order is a little extra today — ETA 47 mins. Chai on us at pickup!'"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Late deliveries are the #1 driver of 1-star reviews on Zomato and Swiggy. Proactive communication about delays (before the customer calls) converts a potential 1-star into a 4-star interaction.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">n8n</span><span class="tool-chip">Google Maps API</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">6</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-06</span><span class="agent-tag">Scheduling</span></div>
+      <h3>Kitchen Staff Scheduling Agent</h3>
+      <p class="agent-desc">Every week, generates an optimized kitchen roster — balancing leave requests, skill requirements per station (grill/biryani/pastry), peak hour coverage, and FSSAI food handler health certification validity — so the kitchen is never understaffed during Friday dinner or Sunday brunch.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Staff leave requests</li><li>Station-wise skill matrix</li><li>Historical footfall by day and hour</li><li>FSSAI certification expiry dates</li><li>Overtime cost threshold</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Optimized weekly roster</li><li>Understaffed slot alert</li><li>Station-skill match verification</li><li>FSSAI expiry alert (30 days before)</li><li>Labour cost projection per week</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 15 roster issue: Sunday lunch (12–2 PM) — Biryani station: Only 1 chef available (Rajan on leave). Biryani demand forecast: 210 portions. Alert: Need 2 chefs. Solution: Move Priya from Tandoor station (Sunday lunch demand: low) to Biryani. Tandoor shift starts 3 PM — no conflict."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Kitchen understaffing during peak service is the single most common cause of slow delivery times and customer complaints. Systematic roster management prevents this avoidable operational failure.</div></div>
+      <div class="tools-row"><span class="tool-chip">HR System</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">7</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-07</span><span class="agent-tag">Compliance</span></div>
+      <h3>FSSAI Hygiene Compliance Checklist Agent</h3>
+      <p class="agent-desc">Every morning and evening, this agent sends a structured hygiene checklist to the head chef — temperature logs, storage checks, cross-contamination prevention, staff hygiene verification, and pest control logs — and consolidates compliance scores for monthly FSSAI audit readiness.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Shift start and end time</li><li>Checklist template (customized per kitchen type)</li><li>Previous non-compliance flags</li><li>Head chef WhatsApp number</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Morning checklist (WhatsApp)</li><li>Evening compliance summary</li><li>Non-compliance flag with photo request</li><li>Monthly compliance score card</li><li>FSSAI audit readiness report (quarterly)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Morning Check — Station 2: ✅ Refrigerator temp: 3°C (target: <5°C) ✅ Raw meat storage: Bottom shelf ✅ Chopping boards: color-coded ❌ Chef Rajan: no hair cap observed. Photo required within 10 minutes. Compliance score today: 94/100. Maintain 90+ for audit readiness."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A single FSSAI violation notice results in closure notices, fines, and viral social media damage. Systematic daily compliance tracking costs 5 minutes per day and prevents catastrophic regulatory risk.</div></div>
+      <div class="tools-row"><span class="tool-chip">WhatsApp</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">8</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-08</span><span class="agent-tag">Supplier</span></div>
+      <h3>Supplier Quality Monitor Agent</h3>
+      <p class="agent-desc">Every week, tracks ingredient quality consistency from each supplier — based on kitchen team feedback, rejection rates, and price variance — and generates a supplier scorecard. Flags unreliable suppliers before their poor quality reaches the customer's plate.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Weekly ingredient quality ratings (kitchen team)</li><li>Rejection/return records per supplier</li><li>Invoice prices vs quoted prices</li><li>Delivery punctuality records</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Supplier scorecard (weekly)</li><li>Quality variance alert (specific ingredient)</li><li>Price discrepancy flag</li><li>Supplier risk classification (Green/Amber/Red)</li><li>Alternative supplier recommendation (if Red)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Supplier alert: Sharma Vegetables (Week 15): Tomato quality rated Poor on 3 of 5 delivery days. Rejection rate: 22% (target: <5%). Invoice price: ₹28/kg vs quoted ₹24/kg. Classification: RED. Recommend: Switch to Ravi Fresh Farms (backup supplier, rated 4.6/5 last 3 months). Issue termination notice to Sharma."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Poor ingredient quality from a single supplier can destroy a dish's consistency for weeks before the kitchen traces the cause. Systematic tracking identifies the source in days, not months.</div></div>
+      <div class="tools-row"><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span><span class="tool-chip">WhatsApp</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">9</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-09</span><span class="agent-tag">Waste</span></div>
+      <h3>Food Waste Reduction Agent</h3>
+      <p class="agent-desc">Tracks daily ingredient usage vs forecast, identifies the top 5 waste contributors every week, and generates specific waste reduction actions — portion adjustment, dish substitution, or repurposing recipes — that reduce food cost percentage without compromising quality.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Daily ingredient stock at open and close</li><li>Orders fulfilled by dish</li><li>Forecast vs actual demand</li><li>Wastage type classification (prep/spoilage/plate waste)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Daily waste report (by ingredient and type)</li><li>Weekly top 5 waste contributors</li><li>Waste reduction action recommendations</li><li>Repurposing recipe suggestions</li><li>Monthly waste cost tracking (₹ value)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 14 waste analysis: Top waste: Paneer (prep waste: 18%, target 8%). Root cause: Over-ordering for weekend (forecast error). Action: Reduce Sunday paneer order by 15%. Repurpose suggestion: Leftover paneer → Paneer Frankie (Friday lunch special). Estimated weekly saving: ₹3,200."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Industry average food waste in Indian restaurants is 8–12% of food cost. A systematic waste reduction program to 4–6% saves ₹15,000–50,000 monthly for a mid-size kitchen — pure profit recovered.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Inventory System</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">10</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">OPS-10</span><span class="agent-tag">Strategy</span></div>
+      <h3>Menu Engineering Optimizer Agent</h3>
+      <p class="agent-desc">Quarterly, this agent analyzes every dish on the menu using the classic Stars/Plowhorses/Puzzles/Dogs matrix — evaluating both profitability AND popularity — and generates specific recommendations: dishes to promote, reprice, reposition, or remove from the menu.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Sales volume per dish (last 90 days)</li><li>Food cost % per dish</li><li>Customer rating per dish</li><li>Menu real estate (current placement)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Menu engineering matrix (4-quadrant)</li><li>Stars (promote) / Dogs (remove) list</li><li>Repositioning recommendations</li><li>Repricing suggestions with impact estimate</li><li>Seasonal removal and addition plan</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Menu engineering Q3 results: Stars (keep & promote): Biryani, Butter Chicken, Gulab Jamun. Dogs (remove): Veg Manchurian (low sales + poor margin). Puzzle (reposition): Thalassery Fish (great margin, low awareness — move to menu header + add photo). Plowhorse (reprice): Dal Makhani (high sales, thin margin — increase by ₹20)."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A menu with 45 items where 12 items generate 70% of revenue and 8 items lose money is a financial trap. Quarterly menu engineering ensures every item earns its spot — and customer attention is directed to your most profitable dishes.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Claude</span><span class="tool-chip">n8n</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+</div><div class="best3"><div><div class="best3-label">🔥 Best 3 Kitchen Agents to Build First</div><ol>
+<li><strong>Demand Forecasting Agent</strong> <span>— stops waste and stockouts simultaneously</span></li>
+<li><strong>Food Cost & Margin Calculator</strong> <span>— reveals which dishes are silently killing your P&L</span></li>
+<li><strong>FSSAI Compliance Checklist Agent</strong> <span>— prevents catastrophic regulatory risk for 5 mins/day</span></li>
+</ol></div></div><div class="section-divider"></div>
+<div id="hr" class="dept-header">
+  <span class="dept-emoji">👥</span>
+  <h2>Department 4 of 5 — HR Process Agents</h2>
+  <p>Build the team that delights every customer. These 10 agents automate hiring for kitchen and service staff, manage shift scheduling, track performance, detect burnout early, and ensure your culture of hospitality is sustained as you scale — from 5 staff to 50.</p>
+  <span class="dept-count">10 HR Agents</span>
+</div>
+<div class="section-divider"></div>
+<div class="agents-grid">
+
+  <div class="agent-card">
+    <div class="agent-num">1</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-01</span><span class="agent-tag">Recruitment</span></div>
+      <h3>Kitchen & Service Staff Recruiter Agent</h3>
+      <p class="agent-desc">When a chef, cook, or service staff application arrives, this agent screens the resume for F&B-specific criteria — culinary skills, past kitchen environment, hygiene certification, language fit, and availability for split shifts — and generates a fit score with role-specific interview questions within 2 minutes.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Resume or WhatsApp application</li><li>Role type (chef/cook/steward/delivery)</li><li>Kitchen cuisine type and volume</li><li>Shift structure requirements</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Fit score (0–100) with breakdown</li><li>Culinary skill assessment</li><li>FSSAI certification check</li><li>Top 5 interview questions (role-specific)</li><li>Recommend: trial / interview / decline</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Fit Score: 74/100. ✅ 3 years North Indian kitchen, ✅ FSSAI certified, ✅ Available for split shift. ❌ No experience with high-volume cloud kitchen. ❌ No Biryani specialization (our core dish). Recommend: 2-day paid trial in kitchen — assess speed and consistency on Biryani station."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A wrong kitchen hire lasts 2–3 months before exit — costing ₹50,000–1.5L in salary, training, and quality issues during the gap. Structured screening prevents this before the first day.</div></div>
+      <div class="tools-row"><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Notion</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">2</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-02</span><span class="agent-tag">Culture</span></div>
+      <h3>Hospitality Culture Fit Evaluator Agent</h3>
+      <p class="agent-desc">Evaluates candidates for the non-negotiable traits of F&B service — patience, empathy, pride in craft, composure under pressure, and genuine love of feeding people. Identifies transactional vs hospitality-minded candidates before they interact with customers.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Situational interview responses (5 questions)</li><li>Role applied for (front-of-house/kitchen/delivery)</li><li>Previous hospitality experience context</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Hospitality mindset score (0–10)</li><li>Composure under pressure assessment</li><li>Craft pride indicators</li><li>Red flag language identified</li><li>Hire / conditional hire / decline</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Green flag: 'When a customer sends back a dish, my first reaction is to understand what went wrong, not to defend the kitchen.' Red flag: All 3 answers about difficult customers end with 'I just followed the process.' Score: 5.5/10. Decline — service role requires emotional ownership, not process compliance."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A technically skilled waiter with a transactional mindset delivers forgettable service. The right attitude, trained in skills, delivers unforgettable experiences. This agent protects the emotional quality of your brand.</div></div>
+      <div class="tools-row"><span class="tool-chip">Google Form</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Notion</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">3</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-03</span><span class="agent-tag">Onboarding</span></div>
+      <h3>New Staff Onboarding Automation Agent</h3>
+      <p class="agent-desc">The moment a new staff member is confirmed, this agent triggers a structured 7-day onboarding — hygiene protocols, menu knowledge, station assignment, team introduction, and culture orientation — delivered via WhatsApp in daily bite-sized steps that don't overwhelm a first-day kitchen hire.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>New hire name, role, start date</li><li>WhatsApp number</li><li>Station assignment</li><li>Reporting senior's name</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Day 1: Welcome + hygiene protocol + uniform checklist</li><li>Day 2: Menu knowledge (top 10 dishes)</li><li>Day 3: Station orientation with senior</li><li>Day 5: Customer interaction standards</li><li>Day 7: First-week feedback form</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Welcome to Spice Garden, Ramesh! 🍛 Day 1: Report to kitchen at 8:30 AM. Uniform: white chef coat + cap (given at store). Your senior: Suresh bhai — shadow him today. First task: Read our top 10 dish recipes (PDF below). Tomorrow: Biryani prep training 6 AM sharp!"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Kitchen staff who feel welcomed and prepared in week 1 have 55% lower 30-day attrition than those thrown into service without orientation. In F&B, early attrition is the most expensive HR cost.</div></div>
+      <div class="tools-row"><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Drive</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">4</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-04</span><span class="agent-tag">Performance</span></div>
+      <h3>Staff Performance Monitor Agent</h3>
+      <p class="agent-desc">Monthly, this agent aggregates each staff member's performance signals — attendance, customer complaints, QC scores (for kitchen), customer ratings (for service staff), and upsell conversion (for waiters) — and generates a structured performance report with specific coaching notes.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Attendance records</li><li>Customer complaint tags (staff-specific)</li><li>QC scores (kitchen staff)</li><li>Customer satisfaction ratings</li><li>Upsell conversion rate (service staff)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Performance score (0–100)</li><li>Ranking vs team</li><li>Top 2 strengths (specific)</li><li>1–2 improvement areas (actionable)</li><li>Coaching plan for next month</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Anand (Waiter, Month 3) — Score: 82/100. ✅ Zero complaints in October. ✅ Highest upsell conversion: 38%. ❌ Arrives 8–12 minutes late on average (4 incidents). ❌ Menu knowledge gap on cocktail list. Coaching: Strict 15-min early arrival for next month. Cocktail menu quiz by November 10th."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B staff who receive structured monthly feedback improve faster and stay longer. Vague verbal feedback during service — the industry norm — changes nothing.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Complaint System</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">5</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-05</span><span class="agent-tag">Wellbeing</span></div>
+      <h3>Team Mood & Burnout Detector Agent</h3>
+      <p class="agent-desc">Every Friday, sends an anonymous 3-question pulse check to all staff, analyzes sentiment, and flags any team member showing burnout signals — declining energy, increased complaints, reduced quality output. In F&B, burnout shows up in the food and the service before it shows up in the resignation letter.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Weekly anonymous pulse (3 questions)</li><li>Attendance and late-arrival trends</li><li>Customer complaint attribution</li><li>Workload (shifts/week per person)</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Team mood score (1–10)</li><li>Individual burnout risk flag</li><li>Manager check-in prompt</li><li>Workload adjustment suggestion</li><li>Recognition list (positive acknowledgment)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Alert: Priya (Sous Chef) — Burnout risk MEDIUM. Pulse score dropped from 7.4 to 5.1 over 2 weeks. Attendance: 3 late arrivals. QC scores: Declining slightly. Working 6 days/week for 3 weeks. Recommended action: Give Priya 1 extra Sunday off. Head Chef to have informal check-in over chai this week."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B has India's highest staff turnover at 60–90% annually. Most exits follow undetected burnout. Early detection and one compassionate conversation retains a trained chef worth 3 months of replacement cost.</div></div>
+      <div class="tools-row"><span class="tool-chip">Google Form</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">WhatsApp</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">6</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-06</span><span class="agent-tag">Training</span></div>
+      <h3>Food Safety & FSSAI Training Agent</h3>
+      <p class="agent-desc">Generates bite-sized, WhatsApp-delivered weekly food safety training modules for kitchen staff — covering personal hygiene, storage temperatures, allergen management, cross-contamination prevention, and FSSAI compliance — with a 5-question quiz to verify understanding each week.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>FSSAI training requirements</li><li>Staff role and kitchen type</li><li>Previous training completion data</li><li>Upcoming audit timeline</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Weekly training module (WhatsApp, 5 mins)</li><li>5-question quiz per module</li><li>Completion tracking</li><li>Refresher trigger (if score below 60%)</li><li>FSSAI training compliance certificate (quarterly)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 12 Training — Allergen Awareness: Did you know: 1 in 10 restaurant complaints involves an allergen reaction? This week's rule: ALWAYS ask if a customer mentions any dietary restriction. Never assume. Flag to the chef — never guess. Quiz: Q1: A customer says they are lactose intolerant. Which of our dishes must be avoided? [Options follow]."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">A single allergen incident results in customer hospitalization, social media crisis, and FSSAI show cause notice. Systematic weekly training creates a food-safe culture that prevents the incident — not just responds to it.</div></div>
+      <div class="tools-row"><span class="tool-chip">WhatsApp</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Forms</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">7</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-07</span><span class="agent-tag">Scheduling</span></div>
+      <h3>Shift Roster & Break Scheduler Agent</h3>
+      <p class="agent-desc">Generates optimized weekly shift rosters — balancing split shifts, leave requests, skill requirements per session, and labor law compliance (maximum hours, mandatory breaks) — and sends personalized shift schedules to each staff member automatically.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Leave and off-day requests</li><li>Session footfall forecast</li><li>Station-skill matrix</li><li>Maximum hours per week per staff</li><li>Labor compliance rules</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Weekly optimized roster (by station and shift)</li><li>Understaffed alert with resolution</li><li>Individual shift WhatsApp notification</li><li>Overtime alert (before it exceeds threshold)</li><li>Week-on-week labor cost comparison</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 15 roster: Saturday dinner (7–10 PM) — CRITICAL: 3 waiters needed, only 2 confirmed (Rajan on leave). Solution: Request Prakash to extend shift by 2 hours (overtime: ₹320). Alternative: Reduce table covers to 80% and enable online waitlist. Both options drafted — manager to choose."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">In F&B, an understaffed peak service crashes the entire customer experience. Roster management is operational risk management — and it requires more discipline than most F&B owners give it.</div></div>
+      <div class="tools-row"><span class="tool-chip">n8n</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">8</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-08</span><span class="agent-tag">Incentives</span></div>
+      <h3>Tip & Incentive Distribution Agent</h3>
+      <p class="agent-desc">Manages fair, transparent distribution of tips (digital and cash), upsell incentives, and performance bonuses — calculating each staff member's entitlement, generating a payment statement, and distributing it automatically — eliminating disputes and perceptions of unfairness.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Daily tip pool amounts (digital + cash)</li><li>Upsell conversion per waiter</li><li>Shift hours per staff (for tip proration)</li><li>Performance bonus eligibility criteria</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Daily tip allocation per staff member</li><li>Monthly upsell incentive statement</li><li>Payment disbursement trigger</li><li>Fairness audit (variance analysis)</li><li>Staff communication of allocation</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 14 tip distribution: Total tips: ₹8,400. Staff on shift: 6. Allocation method: Shift-hours weighted. Ravi (8 hrs): ₹1,680. Priya (6 hrs): ₹1,260. Anand (Upsell champion bonus): +₹350 extra. Total disbursed: ₹8,400. Individual WhatsApp statements sent to all 6 staff."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Tip disputes are the #1 cause of front-of-house team conflicts and voluntary exits. A transparent, automated system eliminates the dispute before it starts — and motivates upselling because staff can see their incentives.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">WhatsApp</span><span class="tool-chip">UPI API</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">9</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-09</span><span class="agent-tag">Analytics</span></div>
+      <h3>Exit Interview & Retention Analyzer Agent</h3>
+      <p class="agent-desc">When an employee resigns, this agent conducts a digital exit interview, classifies the true reason (compensation/growth/working hours/management/culture), identifies patterns across exits, and generates retention recommendations — turning exits into learning that prevents the next one.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Resignation notice and role</li><li>Exit interview responses</li><li>Tenure and performance history</li><li>Working pattern and shifts</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>True exit reason classification</li><li>Sentiment analysis of responses</li><li>Pattern alert (if same reason repeats)</li><li>Recommended policy change</li><li>Retention script (if high performer, before exit)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Exit analysis — Kavitha (Senior Cook, 1.5 years): True reason: Unsustainable 6-day week schedule. Surface reason: 'Personal reasons.' Pattern: 4 of last 6 exits from kitchen cited excessive hours. Recommendation: Implement 5-day mandatory week with 1 split shift — reduces cost ₹0, prevents next 4 exits."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B has the highest industry turnover in India. Treating every exit as isolated misses the systemic patterns. Analyzing 5 exits together reveals the 1–2 changes that prevent the next 10.</div></div>
+      <div class="tools-row"><span class="tool-chip">Google Form</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Notion</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">10</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">HR-10</span><span class="agent-tag">Recruitment</span></div>
+      <h3>Job Description Generator Agent</h3>
+      <p class="agent-desc">When a role opens, generates compelling, honest, F&B-appropriate job descriptions — in English and local language — that attract candidates who love food and hospitality, not just those who need a paycheck. Includes Zomato-style personality descriptions that filter for the right energy.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Role title (chef/waiter/delivery/manager)</li><li>Key responsibilities</li><li>Shift structure and working hours honestly stated</li><li>Salary band and perks</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Full JD (English + regional language)</li><li>WhatsApp referral version (short)</li><li>Indeed/Apna listing version</li><li>Screening questions for application form</li><li>Personality statement (culture signal)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"We're looking for a chef who gets angry when a dish goes out imperfect — and proud when it comes back empty. At Spice Garden, we cook with obsession and serve with warmth. You'll work 5 days a week, 8-hour shifts, with access to our kitchen for your own experiments on Mondays. Morning: 9–5 or evening: 3–11. Fluent in Telugu or Hindi. Salary: ₹18,000–28,000 depending on skill."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">An honest, personality-driven JD attracts 40% fewer applications but 3× more relevant candidates — saving 10+ hours of screening per hire and dramatically improving first-month retention.</div></div>
+      <div class="tools-row"><span class="tool-chip">Claude</span><span class="tool-chip">n8n</span><span class="tool-chip">Apna/Indeed API</span><span class="tool-chip">WhatsApp</span></div>
+    </div>
+  </div>
+</div><div class="best3"><div><div class="best3-label">🔥 Best 3 HR Agents to Build First</div><ol>
+<li><strong>Shift Roster & Break Scheduler</strong> <span>— prevents peak-hour understaffing that kills reviews</span></li>
+<li><strong>Team Mood & Burnout Detector</strong> <span>— prevents exits before resignation letters arrive</span></li>
+<li><strong>Tip & Incentive Distribution Agent</strong> <span>— eliminates team conflicts and motivates upselling</span></li>
+</ol></div></div><div class="section-divider"></div>
+<div id="finance" class="dept-header">
+  <span class="dept-emoji">💰</span>
+  <h2>Department 5 of 5 — Finance & Operations Agents</h2>
+  <p>Run a financially tight restaurant. These 10 agents reconcile daily revenue, track food cost in real time, manage GST and FSSAI compliance, forecast cash flow, and calculate true profitability per dish — turning your POS data into weekly financial intelligence.</p>
+  <span class="dept-count">10 Finance Agents</span>
+</div>
+<div class="section-divider"></div>
+<div class="agents-grid">
+
+  <div class="agent-card">
+    <div class="agent-num">1</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-01</span><span class="agent-tag">Reconciliation</span></div>
+      <h3>Daily Revenue Reconciler Agent</h3>
+      <p class="agent-desc">Every night after closing, this agent reconciles all revenue streams — Zomato, Swiggy, own app, UPI, cash, card, and corporate invoices — against POS totals, identifies any discrepancies, and generates a clean daily P&L summary for the owner by 11 PM.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>POS end-of-day report</li><li>Zomato and Swiggy settlement data</li><li>UPI and payment gateway reports</li><li>Cash tally from cashier</li><li>Corporate invoice issued</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Daily revenue reconciliation (all channels)</li><li>Discrepancy alert (if variance > ₹500)</li><li>Channel-wise revenue breakdown</li><li>Cash vs digital ratio</li><li>Daily P&L summary (sent to owner)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"November 14 reconciliation: Zomato: ₹18,400. Swiggy: ₹12,200. Dine-in (UPI+card): ₹31,500. Cash: ₹6,200. Corporate (Infosys lunch): ₹14,000. Total: ₹82,300. POS total: ₹82,150. Discrepancy: ₹150 (within threshold). Net after platform commissions: ₹72,840. Report sent to Harish ji: 10:47 PM."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Most restaurant owners discover revenue leakage only at month-end, when it's too late to act. Daily reconciliation catches discrepancies within 24 hours — when evidence and correction are still possible.</div></div>
+      <div class="tools-row"><span class="tool-chip">Zomato/Swiggy API</span><span class="tool-chip">POS</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">WhatsApp</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">2</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-02</span><span class="agent-tag">Cost Control</span></div>
+      <h3>Food Cost Percentage Daily Tracker Agent</h3>
+      <p class="agent-desc">Every morning, this agent calculates yesterday's food cost percentage — comparing ingredients consumed (from kitchen logs) against revenue generated — and alerts the owner if food cost exceeds target threshold, identifying the specific dish or category causing the spike.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Previous day ingredient consumption</li><li>Revenue by dish from POS</li><li>Standard recipe food cost targets</li><li>Wastage and yield log</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Yesterday's food cost % (overall)</li><li>Food cost % by category (veg/non-veg/beverage)</li><li>Spike alert (if >target by 3%+)</li><li>Root cause identification</li><li>Corrective action recommendation</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"November 14 food cost: Overall: 39.2% (target: 35%). Spike category: Non-veg dishes — 47.3% food cost (target: 40%). Root cause: Chicken yield low (68% vs expected 75%) — likely supplier quality issue. Action: Check Thursday's chicken batch, weigh samples, raise with Mukesh Poultry today."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Most restaurateurs discover food cost issues at month-end. A 5% food cost spike discovered daily recovers ₹8,000–25,000 weekly that would otherwise be quietly lost to poor yield or waste.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Kitchen Log</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">WhatsApp</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">3</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-03</span><span class="agent-tag">Compliance</span></div>
+      <h3>GST Filing Preparation Agent</h3>
+      <p class="agent-desc">Every month, this agent reconciles all taxable transactions (dine-in 5%, delivery 5%, alcohol 18% if applicable), categorizes them correctly, calculates GST liability, and generates a GSTR-1 ready report for the accountant — reducing filing time from 2 days to 2 hours.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Monthly POS data with tax category</li><li>Bill-by-bill tax collection records</li><li>Input tax credit (ingredients with GST)</li><li>Delivery platform tax documentation</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>GSTR-1 data file (categorized)</li><li>Output tax liability summary</li><li>Input tax credit eligible amount</li><li>Net GST payable calculation</li><li>Filing deadline reminder (7 days before)</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"November GST summary: Total taxable sales: ₹18.4L. GST collected (5%): ₹92,000. Input tax credit (ingredients): ₹24,500. Net GST payable: ₹67,500. GSTR-1 file ready for CA. Filing deadline: December 11th. Reminder set for December 4th."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">GST errors in F&B are common (multiple tax rates, platform commissions, ITC eligibility confusion) and attract notices that cost ₹25,000–2L in penalties and CA fees. Systematic monthly prep prevents these entirely.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">GSTN API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Tally</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">4</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-04</span><span class="agent-tag">Payables</span></div>
+      <h3>Vendor Invoice Processor Agent</h3>
+      <p class="agent-desc">When vendor invoices arrive (via WhatsApp, email, or physical), this agent extracts key data (vendor, items, amounts, GST), matches against purchase orders, flags discrepancies, and queues for payment — maintaining a clear payables ledger without a dedicated accounts team.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Vendor invoice (image/PDF/WhatsApp)</li><li>Purchase order for matching</li><li>Vendor payment terms</li><li>Current payables ledger</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Extracted invoice data (structured)</li><li>PO matching confirmation or discrepancy flag</li><li>Payment due date calculation</li><li>Vendor payment priority queue</li><li>Monthly payables summary</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Invoice received from Mukesh Poultry (WhatsApp image): Extracted: Chicken 80kg @ ₹220/kg = ₹17,600. GST: ₹880. Total: ₹18,480. PO match: ✅ (PO-045). Due date: November 22nd (net 7 days). Added to payment queue. Queue total this week: ₹62,400. Approve payments? [Yes/Review]"</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Manual invoice processing in F&B leads to double payments, missed discounts for early payment, and GST input credit losses. Automated processing catches every error and captures every credit.</div></div>
+      <div class="tools-row"><span class="tool-chip">WhatsApp</span><span class="tool-chip">OCR API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">5</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-05</span><span class="agent-tag">Profitability</span></div>
+      <h3>Dish-Level Profitability Analyzer Agent</h3>
+      <p class="agent-desc">Calculates true net contribution per dish — after food cost, portion waste, platform commission (if delivered), and staff portion time allocation — and generates a weekly dish profit ranking that tells the chef and owner exactly which dishes to push, reprice, or retire.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Revenue per dish (POS)</li><li>Food cost per dish (recipe-based)</li><li>Platform commission rate (if Zomato/Swiggy)</li><li>Prep time allocation per dish</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Net contribution per dish (₹ and %)</li><li>Dish profitability ranking</li><li>Platform impact analysis (dine-in vs delivery margin difference)</li><li>Underperforming dish action plan</li><li>Most profitable dish promotional brief</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Profitability ranking (Week 14): #1 Dal Makhani — contribution ₹171/portion (68% GM). #2 Butter Chicken — ₹198 (63% GM). Last: Prawn Biryani — ₹45/portion (14% GM after platform commission). Action: Remove Prawn Biryani from Swiggy (keep dine-in only). Increase Dal Makhani visibility on menu."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Restaurants that know dish-level profitability make smarter menu decisions. Those that don't promote their most popular dish — which is often their least profitable one — and wonder why margins don't grow.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Recipe DB</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">6</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-06</span><span class="agent-tag">Planning</span></div>
+      <h3>Weekly Cash Flow Forecaster Agent</h3>
+      <p class="agent-desc">Every Monday, forecasts the week's cash flow — incoming (expected orders, corporate invoices due, platform settlements) against outgoing (vendor payments, staff salaries, rent, platform commissions) — and flags any negative cash day 5–7 days in advance.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Expected revenue (from demand forecast)</li><li>Vendor payment due dates</li><li>Platform settlement schedule (T+7 or T+14)</li><li>Staff salary and incentive dates</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>7-day cash flow projection</li><li>Negative cash day alert (specific date)</li><li>Advance collection recommendation</li><li>Payment deferral option (if needed)</li><li>Working capital requirement note</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 15 cash flow: Tuesday surplus: ₹18,400. Thursday GAP: -₹22,000 (Zomato settlement delayed, vendor payments due). Action: Collect ₹15,000 from Infosys corporate invoice (due Nov 15 — follow up today). Request Mukesh Poultry to extend payment to Nov 20th. Gap reduces to ₹7,000 — manageable."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">F&B businesses have unpredictable cash cycles — platform settlements are delayed, vendors demand early payment, and seasonal revenue swings create gaps. 7-day advance visibility prevents cash emergencies.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Platform API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">7</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-07</span><span class="agent-tag">Loyalty</span></div>
+      <h3>Loyalty Points Liability Tracker Agent</h3>
+      <p class="agent-desc">If you run a loyalty points program, this agent tracks outstanding points liability — how many points have been issued, how many are near expiry, what the estimated redemption value is — so management knows the true financial liability of the program and can design offers that manage it.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Loyalty points issued (by customer)</li><li>Points redemption history</li><li>Points expiry schedule</li><li>Points-to-₹ redemption value</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Total outstanding points liability (₹ value)</li><li>Points expiring this month (action needed)</li><li>Redemption rate trend</li><li>Monthly points cost vs revenue driven</li><li>Program ROI assessment</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"November loyalty snapshot: Outstanding points: 4,28,000 points (₹42,800 liability at ₹0.10/point). Expiring this month: 52,000 points (₹5,200). Redemption rate: 23% (industry avg: 30%). Action: Push 'Redeem before expiry' campaign to 340 customers with near-expiry points — drives visits at lower cash cost than discount campaigns."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Loyalty programs that issue points without tracking liability create surprise redemption waves that damage cash flow. Proactive tracking turns the liability into a managed marketing asset.</div></div>
+      <div class="tools-row"><span class="tool-chip">CRM</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">8</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-08</span><span class="agent-tag">Multi-outlet</span></div>
+      <h3>Franchise & Multi-Outlet Revenue Reconciler</h3>
+      <p class="agent-desc">For restaurant chains or cloud kitchen networks, this agent consolidates revenue, cost, and profitability data across all outlets weekly — identifying which outlets are performing, which are lagging, and what specific operational issue is driving the variance.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Revenue data per outlet</li><li>Food cost per outlet</li><li>Staff cost per outlet</li><li>Platform commission per outlet</li><li>Outlet-level customer rating</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Weekly multi-outlet performance dashboard</li><li>Outlet ranking (revenue + margin)</li><li>Underperforming outlet root cause</li><li>Best practice from top outlet (shareable)</li><li>Corporate overhead allocation</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Week 15 multi-outlet: Top: Koramangala (GM: 58%, rating: 4.4). Lagging: Whitefield (GM: 41%, rating: 3.9). Root cause Whitefield: Food cost spike (48%) + delivery time complaints (avg 52 mins vs SLA 35 mins). Best practice transfer: Koramangala's demand-based prep schedule — send Head Chef for 2-day visit."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Multi-outlet F&B operators who manage by outlet-level data outperform those who look only at consolidated numbers by 23% in margin within 12 months. Precision management compounds.</div></div>
+      <div class="tools-row"><span class="tool-chip">Multi-POS API</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">9</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-09</span><span class="agent-tag">Analytics</span></div>
+      <h3>Budget vs Actual Variance Reporter Agent</h3>
+      <p class="agent-desc">Every month, compares actual restaurant performance against the annual operating budget — revenue, food cost, labor cost, rent, and marketing — generates a variance report with root cause analysis, and recommends corrective actions for the next month.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Annual budget by line item</li><li>Monthly actual P&L</li><li>Previous month comparison</li><li>Seasonal adjustment factors</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>Budget vs actual dashboard (all line items)</li><li>Favourable and adverse variances flagged</li><li>Root cause for top 5 variances</li><li>Corrective action recommendations</li><li>Revised year-end forecast</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"October variance: Revenue: ₹68L actual vs ₹75L budget (adverse ₹7L — 9%). Root cause: Zomato commission increase (from 22% to 25%) not reflected in pricing. Labor: ₹12.4L vs ₹11L budget (adverse ₹1.4L — overtime from festival week). Action: Review Zomato dish pricing by ₹15–20 to recover margin."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Monthly budget review with root cause analysis allows 11 course-corrections per year. Annual review allows zero. The difference in financial outcome between these two approaches compounds dramatically over 3 years.</div></div>
+      <div class="tools-row"><span class="tool-chip">POS</span><span class="tool-chip">Tally</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+
+  <div class="agent-card">
+    <div class="agent-num">10</div>
+    <div class="agent-body">
+      <div class="agent-meta"><span class="agent-id">FIN-10</span><span class="agent-tag">Strategy</span></div>
+      <h3>Customer Lifetime Value Analyzer Agent</h3>
+      <p class="agent-desc">Calculates the true lifetime value of each customer — total revenue over all visits, average order value, visit frequency, loyalty program participation, referral conversions — to help management identify which customers to invest in retaining and which acquisition channels produce the most valuable customers.</p>
+      <div class="io-grid">
+        <div class="io-box input"><h4>INPUT</h4><ul><li>Customer order history (all time)</li><li>Referral conversion data</li><li>Loyalty redemption data</li><li>Acquisition channel tags</li></ul></div>
+        <div class="io-box output"><h4>OUTPUT</h4><ul><li>LTV per customer (₹ value)</li><li>LTV by acquisition channel</li><li>High-LTV customer segment profile</li><li>Retention investment recommendation</li><li>Churn prediction for at-risk high-LTV customers</li></ul></div>
+      </div>
+      <div class="example-box"><h4>EXAMPLE OUTPUT</h4><p>"Ananya Sharma LTV: 28 visits over 18 months. Avg order ₹720. Total spend: ₹20,160. Referrals: 3 converted (₹8,400 revenue). Loyalty redeemed: ₹1,200 (net cost: ₹1,200). NET LTV: ₹27,360. Acquisition via Instagram ad: ₹320. ROI: 85×. Segment: VIP. Recommendation: Personal birthday call from owner + ₹500 credit annually — investment ₹500, protected ₹27K LTV."</p></div>
+      <div class="impact-row"><span class="impact-icon">📈</span><div class="impact-text">Knowing your highest-LTV customers by name and acquisition channel changes how you spend your marketing budget — and which customers you pick up the phone for. Most restaurants treat every customer the same. Winners don't.</div></div>
+      <div class="tools-row"><span class="tool-chip">CRM</span><span class="tool-chip">POS</span><span class="tool-chip">n8n</span><span class="tool-chip">Claude</span><span class="tool-chip">Google Sheets</span></div>
+    </div>
+  </div>
+</div><div class="best3"><div><div class="best3-label">🔥 Best 3 Finance Agents to Build First</div><ol>
+<li><strong>Daily Revenue Reconciler</strong> <span>— catches leakage within 24 hours, not month-end</span></li>
+<li><strong>Food Cost % Daily Tracker</strong> <span>— most financially impactful kitchen-level agent</span></li>
+<li><strong>GST Filing Preparation Agent</strong> <span>— prevents ₹25K–2L in avoidable penalty risk</span></li>
+</ol></div></div>
+<footer>
+  <p><strong>Bharat Unnati AI Fellowship</strong> — Student Project Documentation v1.0</p>
+  <p style="margin-top:8px;">AI Agent OS for Food & Beverages | 50 Production-Ready Agents | AICTE NEAT 6.0 Accredited Program</p>
+  <p style="margin-top:8px;">Built with ❤️ for India's AI-Ready Generation | bharatunnatiaifellowship.com</p>
+</footer>
+</body>
+</html>

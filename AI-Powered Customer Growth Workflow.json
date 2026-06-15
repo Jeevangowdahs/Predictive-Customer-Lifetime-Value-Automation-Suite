@@ -1,0 +1,321 @@
+{
+  "name": "AI-Powered Customer Growth Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fnb-review-trigger",
+        "options": {}
+      },
+      "name": "Review Entry (Webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        208
+      ],
+      "id": "808bc3db-31bd-4671-ba1b-f81a5d55a188",
+      "webhookId": "f2a1cb40-b720-425d-8a8e-6f9c6f25f8eb"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        400
+      ],
+      "id": "de358bb3-348e-405c-8daa-ebd06acbecbf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8FfxI0H5XvvlKBcu",
+          "name": "Google Gemini(PaLM) Api account 128"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        400
+      ],
+      "id": "25977a6d-5ccb-48e4-8bcd-de7979a78254",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8FfxI0H5XvvlKBcu",
+          "name": "Google Gemini(PaLM) Api account 128"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        416
+      ],
+      "id": "8a21733b-9de6-4764-958c-85d99d467046",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8FfxI0H5XvvlKBcu",
+          "name": "Google Gemini(PaLM) Api account 128"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        416
+      ],
+      "id": "028a157b-347c-4a22-adf0-0ec623d86853",
+      "name": "Google Gemini Chat Model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8FfxI0H5XvvlKBcu",
+          "name": "Google Gemini(PaLM) Api account 128"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this review: {{ $node[\"Review Entry (Webhook)\"].json.body.comment }}. You are the MKT-05 Review Agent  . If it's a 4-5 star review, thank them warmly  . If it's 1-3 stars, apologize and offer the discount code: RECOVER10  .",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an expert F&B hospitality agent focused on building brand reputation and customer loyalty"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -304,
+        208
+      ],
+      "id": "3498326c-121c-4eb0-936b-460773f2958f",
+      "name": "Review Agent"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a 2-sentence WhatsApp promo for {{ $node[\"Review Entry (Webhook)\"].json.body.reviewerName }}. Use these preference tags to personalize it . Mention a special weekend discount on their favorite items.{{ $json.text }}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the MKT-01 Content Generator for a premium restaurant in Hassan. Your job is to write short, high-converting WhatsApp promotions that feel personal and friendly, not like spam."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        400,
+        208
+      ],
+      "id": "417f73f8-1827-4df5-b6dc-ceeb91594db7",
+      "name": "MKT-01 (Menu Promotion Generator)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract food preference tags from this review: \"{{ $node[\"Review Entry (Webhook)\"].json.body.comment }}\". Example output: \"Biryani Lover, Spicy Enthusiast, Delivery Sensitive\"",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the SLS-07 Taste Preference Profiler. Your goal is to identify specific food likes and customer behavior from reviews. Output only short, comma-separated tags."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        64,
+        208
+      ],
+      "id": "625f7b4d-2acc-414e-bb63-7bbae3d1e45b",
+      "name": "SLS-07 (Taste Preference Profiler)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Based on the review: \"{{ $node[\"Review Entry (Webhook)\"].json.body.comment }}\", what is the best day and time next week to send this customer their promotion to maximize the chance of a repeat order?",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are the SLS-03 Repeat Order Strategist. Analyze the feedback to suggest the best re-engagement timing."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        736,
+        208
+      ],
+      "id": "bbd61f01-a010-44b5-a7f9-ba6359c63859",
+      "name": "SLS-03 (Repeat Order Strategist)"
+    },
+    {
+      "parameters": {
+        "chatId": "5392614415",
+        "text": "={{ $node[\"MKT-01 (Menu Promotion Generator)\"].json.text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1088,
+        208
+      ],
+      "id": "f6d56153-2476-4a70-9f5f-431185184f9f",
+      "name": "Send a text message",
+      "webhookId": "2948822c-5cb4-44bb-8038-f70451da22b0",
+      "credentials": {
+        "telegramApi": {
+          "id": "ctu2eJwBCo2I00ZY",
+          "name": "Telegram account 53"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Review Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Entry (Webhook)": {
+      "main": [
+        [
+          {
+            "node": "Review Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SLS-07 (Taste Preference Profiler)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "MKT-01 (Menu Promotion Generator)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SLS-03 (Repeat Order Strategist)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review Agent": {
+      "main": [
+        [
+          {
+            "node": "SLS-07 (Taste Preference Profiler)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MKT-01 (Menu Promotion Generator)": {
+      "main": [
+        [
+          {
+            "node": "SLS-03 (Repeat Order Strategist)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLS-07 (Taste Preference Profiler)": {
+      "main": [
+        [
+          {
+            "node": "MKT-01 (Menu Promotion Generator)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLS-03 (Repeat Order Strategist)": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b2aed864-14b3-42ab-9d83-42d5c6b400af",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "792006ef7a7ebc36fc5abd99bf921da5e1552f75133b4eebce244bda1ddbd0bd"
+  },
+  "id": "BlSDvVNdSXO043BB",
+  "tags": []
+}
